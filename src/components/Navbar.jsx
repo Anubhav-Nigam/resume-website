@@ -2,18 +2,43 @@ import { useEffect, useState } from "react"
 import { FaMoon, FaSun, FaDesktop } from "react-icons/fa"
 import useTheme from "../hooks/useTheme"
 
+const sections = ["about", "projects", "experience", "contact"]
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
   const { theme, changeTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50)
+
+      let current = ""
+
+      sections.forEach((section) => {
+        const element = document.getElementById(section)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            current = section
+          }
+        }
+      })
+
+      setActiveSection(current)
     }
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const linkClass = (section) =>
+    `transition ${
+      activeSection === section
+        ? "text-[var(--color-text)] border-b border-[var(--color-accent)]"
+        : "text-[var(--color-muted)] hover:text-[var(--color-text)]"
+    }`
 
   return (
     <nav
@@ -33,17 +58,17 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
 
           {/* Nav Links */}
-          <div className="hidden md:flex gap-6 text-sm text-[var(--color-muted)]">
-            <a href="#about" className="hover:text-[var(--color-text)] transition">
+          <div className="hidden md:flex gap-6 text-sm">
+            <a href="#about" className={linkClass("about")}>
               About
             </a>
-            <a href="#projects" className="hover:text-[var(--color-text)] transition">
+            <a href="#projects" className={linkClass("projects")}>
               Projects
             </a>
-            <a href="#experience" className="hover:text-[var(--color-text)] transition">
+            <a href="#experience" className={linkClass("experience")}>
               Experience
             </a>
-            <a href="#contact" className="hover:text-[var(--color-text)] transition">
+            <a href="#contact" className={linkClass("contact")}>
               Contact
             </a>
           </div>
@@ -90,7 +115,6 @@ export default function Navbar() {
           </div>
 
         </div>
-
       </div>
     </nav>
   )
